@@ -52,9 +52,13 @@ const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
   <body>
     <slot />
     <script>
-      // Reveal-on-scroll — opt-in via .reveal class
-      const els = document.querySelectorAll('.reveal');
-      if ('IntersectionObserver' in window) {
+      // Reveal-on-scroll — single-shot IntersectionObserver
+      function bindReveals() {
+        const els = document.querySelectorAll('.reveal:not(.is-visible)');
+        if (!('IntersectionObserver' in window)) {
+          els.forEach((el) => el.classList.add('is-visible'));
+          return;
+        }
         const io = new IntersectionObserver((entries) => {
           entries.forEach((e) => {
             if (e.isIntersecting) {
@@ -63,20 +67,21 @@ const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
               io.unobserve(e.target);
             }
           });
-        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
         els.forEach((el) => io.observe(el));
-      } else {
-        els.forEach((el) => el.classList.add('is-visible'));
       }
+      bindReveals();
+      document.addEventListener('astro:page-load', bindReveals);
 
       // Filter buttons on the home feed
-      const filters = document.getElementById('filters');
-      if (filters) {
+      function bindFilters() {
+        const filters = document.getElementById('filters');
+        if (!filters) return;
         filters.addEventListener('click', (e) => {
           const btn = (e.target as HTMLElement).closest('button');
           if (!btn) return;
           const f = (btn as HTMLElement).dataset.filter;
-          document.querySelectorAll('#filters button').forEach((b) => b.classList.remove('active'));
+          filters.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
           document.querySelectorAll('.entry').forEach((entry) => {
             const el = entry as HTMLElement;
@@ -85,6 +90,8 @@ const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
           });
         });
       }
+      bindFilters();
+      document.addEventListener('astro:page-load', bindFilters);
     </script>
   </body>
 </html>

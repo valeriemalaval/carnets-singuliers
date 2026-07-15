@@ -21,7 +21,7 @@ const carnets = (await getCollection('carnets')).sort(
     <Pillars />
 
     <section>
-      <div class="feed-header">
+      <div class="feed-header reveal">
         <h2>Derniers carnets</h2>
         <div class="filters" id="filters">
           <button data-filter="all" class="active">Tout</button>
@@ -30,7 +30,7 @@ const carnets = (await getCollection('carnets')).sort(
           <button data-filter="contrebande">Contrebande</button>
         </div>
       </div>
-      <div>
+      <div class="stagger">
         {carnets.map((entry, i) => <ArticleCard entry={entry} index={i} />)}
       </div>
     </section>
