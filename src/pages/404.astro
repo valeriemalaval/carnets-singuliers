@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Carnet introuvable">
+  <div class="wrap" style="padding-top: 4rem;">
+    <p style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-faint); margin-bottom: 1rem;">
+      404 · Carnet introuvable
+    </p>
+    <h1 style="font-family: var(--font-display); font-weight: 500; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; margin: 0 0 1.25rem; max-width: 22ch;">
+      Cette page n'existe pas, ou n'existe plus.
+    </h1>
+    <p style="color: var(--ink-soft); font-size: 1.1rem; margin: 0 0 2rem; max-width: 38rem;">
+      Elle a peut-être été déplacée, ou le lien que vous suivez est incomplet. Les carnets, eux, sont toujours là.
+    </p>
+    <a
+      href="/"
+      style="font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); padding-bottom: 2px;"
+    >← Retour aux carnets</a>
+  </div>
+</BaseLayout>

@@ -1,0 +1,91 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { CATEGORIES } from '../../consts';
+
+export const getStaticPaths = (async () => {
+  const carnets = await getCollection('carnets');
+  carnets.sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+  return carnets.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: {
+      entry,
+      prev: i > 0 ? carnets[i - 1] : null,
+      next: i < carnets.length - 1 ? carnets[i + 1] : null,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const cat = CATEGORIES[entry.data.category];
+
+const dateStr = entry.data.date.toLocaleDateString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+const words = entry.body?.split(/\s+/).length ?? 0;
+const minutes = Math.max(1, Math.ceil(words / 200));
+---
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.teaser}
+  type="article"
+>
+  <div class="wrap">
+    <Header />
+  </div>
+
+  <article class="prose">
+    <header class="article-head reveal" style={`--c: var(--${entry.data.category})`}>
+      <div class="tag">{cat.label}</div>
+      <h1>{entry.data.title}</h1>
+      <div class="date">{dateStr} · {minutes} min de lecture</div>
+    </header>
+
+    <div class="article-body reveal" style={`--c: var(--${entry.data.category})`}>
+      {entry.data.stub ? (
+        <>
+          <div class="stub-notice" style={`--c: var(--${entry.data.category})`}>
+            Ce carnet est une amorce. Le texte complet arrive bientôt.
+          </div>
+          {entry.body && <Content />}
+        </>
+      ) : (
+        <Content />
+      )}
+    </div>
+
+    {(prev || next) && (
+      <nav class="article-nav">
+        {prev ? (
+          <a class="article-nav-link prev" href={`/carnets/${prev.id}/`}>
+            <span class="nav-dir">← Précédent</span>
+            <span class="nav-title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <div></div>
+        )}
+        {next ? (
+          <a class="article-nav-link next" href={`/carnets/${next.id}/`}>
+            <span class="nav-dir">Suivant →</span>
+            <span class="nav-title">{next.data.title}</span>
+          </a>
+        ) : (
+          <div></div>
+        )}
+      </nav>
+    )}
+
+    <a class="back-link" href="/#carnets">← Tous les carnets</a>
+  </article>
+
+  <div class="wrap">
+    <Footer />
+  </div>
+</BaseLayout>

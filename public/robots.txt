@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://valerie-carnets.netlify.app/sitemap-index.xml

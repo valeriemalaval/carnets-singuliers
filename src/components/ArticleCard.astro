@@ -1,0 +1,33 @@
+---
+import { CATEGORIES } from '../consts';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'carnets'>;
+  index: number;
+}
+
+const { entry, index } = Astro.props;
+const { data, id } = entry;
+const cat = CATEGORIES[data.category];
+
+const dateStr = data.date.toLocaleDateString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+const words = entry.body?.split(/\s+/).length ?? 0;
+const minutes = Math.max(1, Math.ceil(words / 200));
+---
+<a class={`entry tag-${data.category} reveal`} href={`/carnets/${id}/`} style={`--reveal-delay: ${index * 80}ms`}>
+  <div class="entry-meta">
+    <span>{cat.label}</span>
+    <span>·</span>
+    <span>{dateStr}</span>
+    <span>·</span>
+    <span>{minutes} min</span>
+  </div>
+  <h3 class="entry-title">{data.title}</h3>
+  {data.teaser && <p class="entry-teaser">{data.teaser}</p>}
+</a>

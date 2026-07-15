@@ -1,0 +1,12 @@
+---
+import { CATEGORIES } from '../consts';
+---
+<section class="pillars" id="carnets">
+  {Object.entries(CATEGORIES).map(([key, cat]) => (
+    <article class={`pillar ${key} reveal`}>
+      <div class="node">{cat.label}</div>
+      <h3>{cat.tagline}</h3>
+      <p>{cat.description}</p>
+    </article>
+  ))}
+</section>

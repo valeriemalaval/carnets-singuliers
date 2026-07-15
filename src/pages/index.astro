@@ -1,17 +1,45 @@
 ---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Hero from '../components/Hero.astro';
+import Pillars from '../components/Pillars.astro';
+import ArticleCard from '../components/ArticleCard.astro';
 
+const carnets = (await getCollection('carnets')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 ---
+<BaseLayout>
+  <div class="wrap">
+    <Header />
+  </div>
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+  <div class="wrap">
+    <Hero />
+    <Pillars />
+
+    <section>
+      <div class="feed-header">
+        <h2>Derniers carnets</h2>
+        <div class="filters" id="filters">
+          <button data-filter="all" class="active">Tout</button>
+          <button data-filter="contre-jour">Contre-jour</button>
+          <button data-filter="hors-piste">Hors-piste</button>
+          <button data-filter="contrebande">Contrebande</button>
+        </div>
+      </div>
+      <div>
+        {carnets.map((entry, i) => <ArticleCard entry={entry} index={i} />)}
+      </div>
+    </section>
+
+    <section class="about reveal">
+      <div class="about-eyebrow">À propos</div>
+      <p>Trente ans à observer comment les organisations décident sous pression. En parallèle&nbsp;: un roman qui pose la même question autrement, et les outils qu'il faut construire soi-même quand la pensée ne suit pas les rails prévus pour elle.</p>
+    </section>
+
+    <Footer />
+  </div>
+</BaseLayout>

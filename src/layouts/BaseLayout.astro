@@ -1,0 +1,90 @@
+---
+import { SITE } from '../consts';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  type?: 'website' | 'article';
+}
+
+const {
+  title = SITE.name,
+  description = SITE.description,
+  ogImage = '/img/og-image.jpg',
+  type = 'website',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).toString();
+const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
+---
+<!doctype html>
+<html lang={SITE.locale}>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{fullTitle}</title>
+    <meta name="description" content={description}>
+    <link rel="canonical" href={canonical}>
+    <meta name="theme-color" content="#F2F3EE">
+    <meta name="generator" content={Astro.generator}>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <meta property="og:type" content={type}>
+    <meta property="og:site_name" content={SITE.name}>
+    <meta property="og:title" content={fullTitle}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? SITE.url).toString()}>
+    <meta property="og:url" content={canonical}>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={fullTitle}>
+    <meta name="twitter:description" content={description}>
+    <meta name="twitter:image" content={new URL(ogImage, Astro.site ?? SITE.url).toString()}>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} — Flux RSS`} href="/rss.xml">
+  </head>
+  <body>
+    <slot />
+    <script>
+      // Reveal-on-scroll — opt-in via .reveal class
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              const delay = (e.target as HTMLElement).style.getPropertyValue('--reveal-delay') || '0ms';
+              setTimeout(() => e.target.classList.add('is-visible'), parseInt(delay) || 0);
+              io.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+
+      // Filter buttons on the home feed
+      const filters = document.getElementById('filters');
+      if (filters) {
+        filters.addEventListener('click', (e) => {
+          const btn = (e.target as HTMLElement).closest('button');
+          if (!btn) return;
+          const f = (btn as HTMLElement).dataset.filter;
+          document.querySelectorAll('#filters button').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.querySelectorAll('.entry').forEach((entry) => {
+            const el = entry as HTMLElement;
+            const cat = el.className.match(/tag-(\S+)/)?.[1];
+            el.style.display = f === 'all' || cat === f ? '' : 'none';
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
